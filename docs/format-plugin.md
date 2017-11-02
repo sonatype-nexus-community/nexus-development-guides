@@ -4,7 +4,7 @@ This guide provides an introduction on how to build a plugin to add support for 
 
 # What you'll build
 
-You'll build a simple plugin akin to the Raw format with support for Hosted, Proxy and Group repositories. More information about the different repository types can be found at https://help.sonatype.com
+You'll build a simple plugin akin to the Raw format with support for Hosted, Proxy and Group repositories. More information about the different repository types can be found at [Repository Management](https://help.sonatype.com/display/NXRM3/Repository+Management)
 
 # Useful resources
 
@@ -30,10 +30,14 @@ First you create a new plugin project and the easiest way to do this is using th
     -DarchetypeGroupId=org.sonatype.nexus.archetype   
     -DarchetypeVersion=1.0-SNAPSHOT                   
     -DgroupId=com.sonatype.repository                 
-    -DartifactId=nexus-repository-example                 
-    -DpluginFormat=example                                
-    -DpluginClass=Example                                 
+    -DartifactId=nexus-repository-foo                 
+    -DpluginFormat=foo                                
+    -DpluginClass=Food                                 
     -Dversion=1.0-SNAPSHOT 
   ```   
   
-This will create a project with a skeleton format plugin infrastructure in the directory of your choosing. The above parameters would generate the plugin in nexus-repository-example for the "Example" format.
+This will create a project with a skeleton format plugin infrastructure in the directory of your choosing. The above parameters would generate the plugin in nexus-repository-foo for the "Foo" format.
+
+Open this project in the IDE / editor of your choice and you should have a project that looks like
+
+![picture alt](initial-plugin-project-structure.png)
