@@ -42,18 +42,18 @@ If you are trying to use your new custom plugin permanently, it likely makes mor
 * Copy the bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-foo/1.0.0/nexus-repository-foo-1.0.0.jar`
 * If you are using OSS edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
 * If you are using PRO edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-pro-feature/3.x.y/nexus-pro-feature-3.x.y-features.xml`
-   ```
+```
          <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
-   +     <feature version="1.0.0" prerequisite="false" dependency="false">nexus-repository-foo</feature>
+         <feature version="1.0.0" prerequisite="false" dependency="false">nexus-repository-foo</feature>
          <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-yum</feature>
      </feature>
-   ```
+```
    And
-   ```
-   + <feature name="nexus-repository-foo" description="org.sonatype.nexus.plugins:nexus-repository-foo" version="1.0.0">
-   +     <details>org.sonatype.nexus.plugins:nexus-repository-foo</details>
-   +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-foo/1.0.0</bundle>
-   + </feature>
+```
+      <feature name="nexus-repository-foo" description="org.sonatype.nexus.plugins:nexus-repository-foo" version="1.0.0">
+         <details>org.sonatype.nexus.plugins:nexus-repository-foo</details>
+         <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-foo/1.0.0</bundle>
+      </feature>
     </features>
-   ```
+```
 This will cause the plugin to be loaded and started with each startup of Nexus Repository.
