@@ -1,7 +1,7 @@
 ## Installing a custom Nexus 3 plugin
 
-There are a range of options for installing the a plugin. You'll need to build it first, and
-then install the plugin with the options shown below:
+There are a range of options for installing a plugin. You'll need to build it first, and
+then install the plugin with the options shown below.
 
 ### Temporary Install
 
