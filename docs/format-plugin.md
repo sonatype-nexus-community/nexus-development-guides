@@ -41,3 +41,9 @@ This will create a project with a skeleton format plugin infrastructure in the d
 Open this project in the IDE / editor of your choice and you should have a project that looks like
 
 ![picture alt](initial-plugin-project-structure.png)
+
+## Building and using the new plugin
+
+Build the new plugin using: ``` mvn clean install ```
+
+As you will be developing the plugin I suggest doing a temporary install as documented in [Intalling a custom Nexus 3 plugin](./plugin-install.html).
