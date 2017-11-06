@@ -18,7 +18,7 @@ First you create a new plugin project and the easiest way to do this is using th
 
 ## Clone and build the archetype
 
-1. git clone https://github.com/doddi/format-plugin.git
+1. git clone https://github.com/sonatype-nexus-community/nexus-format-archetype
 2. Change directory to format-plugin.
 3. Build the archetype: ``` mvn clean install ```
 4. Change directory to a new folder where you want the new plugin to live.
@@ -26,7 +26,7 @@ First you create a new plugin project and the easiest way to do this is using th
 
   ``` 
     mvn archetype:generate                              
-    -DarchetypeArtifactId=format-plugin               
+    -DarchetypeArtifactId=nexus-format-archetype               
     -DarchetypeGroupId=org.sonatype.nexus.archetype   
     -DarchetypeVersion=1.0-SNAPSHOT                   
     -DgroupId=com.sonatype.repository                 
