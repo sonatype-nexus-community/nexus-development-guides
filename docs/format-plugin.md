@@ -1,13 +1,21 @@
-:toc: macro
-:toc-title:
-:toclevels: 99
-
 # Developing a Plugin for a new Format [WIP]
 
 This guide provides an introduction on developing a plugin to add support for a new format to Nexus Repository Manager 3. 
 It will give you a quick introduction into coding a format. It won't cover the nitty gritty of how to reverse engineer a format.
 
-toc::[]
+- [Developing a Plugin for a new Format [WIP]](#developing-a-plugin-for-a-new-format-wip)
+- [What you'll build](#what-youll-build)
+- [Useful resources](#useful-resources)
+- [Creating a project skeleton](#creating-a-project-skeleton)
+  * [Clone and build the archetype](#clone-and-build-the-archetype)
+  * [Building and using the new plugin](#building-and-using-the-new-plugin)
+- [Implementing a Proxy Repository](#implementing-a-proxy-repository)
+  * [Proxy Recipe](#proxy-recipe)
+  * [The facets](#the-facets)
+  * [Configuring the endpoints](#configuring-the-endpoints)
+  * [Request handlers](#request-handlers)
+  * [Proxy Facet](#proxy-facet)
+- [Format specific considerations](#format-specific-considerations)⏎       
 
 # What you'll build
 
