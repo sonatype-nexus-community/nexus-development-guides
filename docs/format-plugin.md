@@ -202,12 +202,13 @@ request will be passed through the route and therefore passed to each handler de
 The stock proxy handler relies on a format-specific Proxy Facet implementation for fetching, manipulating and storing
 requested packages and metadata.
 
-Create a Proxy Facet implementation for the Foo format. Extending ProxyFacetSupport removes a lot of the http request
-boilerplate.
+Create a Proxy Facet implementation for the Foo format.
 
 ```
 com.sonatype.repository.foo.internal.proxy.FooProxyFacet.java
 ```
+
+Extending ProxyFacetSupport removes a lot of the http request boilerplate.
 
 ```java
 package com.sonatype.repository.foo.internal.proxy;
