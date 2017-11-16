@@ -199,7 +199,7 @@ request will be passed through the route and therefore passed to each handler de
 | ProxyHandler              | Adds common proxy functionality and makes use of the ProxyFacet for caching assets. |
 
 ## Proxy Facet
-The stock proxy handler relies on a format-specific Proxy Facet Implementation for fetching, manipulating and storing
+The stock proxy handler relies on a format-specific Proxy Facet implementation for fetching, manipulating and storing
 requested packages and metadata.
 
 Create a Proxy Facet implementation for the Foo format. Extending ProxyFacetSupport removes a lot of the http request
@@ -418,3 +418,6 @@ added. This is an example of Aspect Oriented Programming (AOP).
 - Two things get saved to the database for each fetch, an [Asset and a Component](https://help.sonatype.com/display/NXRM3/Components%2C+Repositories%2C+and+Repository+Formats). In our Foo format example there is a 1-1 relationship between the assets and components.
 - If redeploy is enabled on a repository then assets can be updated.
 - The contents of the fetched package (its bytes) are written to the [Blob Store](https://help.sonatype.com/display/NXRM3/Repository+Management#RepositoryManagement-BlobStores).
+
+# Format specific considerations
+- Does the format store absolute URLs in its metadata? This could cause the format client to circumvent Nexus.
