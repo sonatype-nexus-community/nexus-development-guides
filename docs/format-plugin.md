@@ -42,7 +42,7 @@ First create a new plugin project. The simplest way is to use the format-plugin 
 
   ``` 
     mvn archetype:generate                              
-    -DarchetypeArtifactId=format-plugin               
+    -DarchetypeArtifactId=nexus-format-archetype
     -DarchetypeGroupId=org.sonatype.nexus.archetype   
     -DarchetypeVersion=1.0-SNAPSHOT                   
     -DgroupId=com.sonatype.repository                 
