@@ -14,7 +14,7 @@ It will give you a quick introduction into coding a format. It won't cover the n
   * [Configuring the endpoints](#configuring-the-endpoints)
   * [Request handlers](#request-handlers)
   * [Proxy Facet](#proxy-facet)
-- [Format specific considerations](#format-specific-considerations)⏎       
+- [Format specific considerations](#format-specific-considerations)     
 
 # What you'll build
 
