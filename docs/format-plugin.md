@@ -1,11 +1,13 @@
+:toc: macro
+:toc-title:
+:toclevels: 99
+
 # Developing a Plugin for a new Format [WIP]
 
 This guide provides an introduction on developing a plugin to add support for a new format to Nexus Repository Manager 3. 
 It will give you a quick introduction into coding a format. It won't cover the nitty gritty of how to reverse engineer a format.
 
-:toc: macro
-:toc-title:
-:toclevels: 99
+toc::[]
 
 # What you'll build
 
