@@ -1,4 +1,4 @@
-# Developing a Plugin for a new Format
+# Developing a Plugin for a new Format [WIP]
 
 This guide provides an introduction on developing a plugin to add support for a new format to Nexus Repository Manager 3. 
 It will give you a quick introduction into coding a format. It won't cover the nitty gritty of how to reverse engineer a format.
@@ -54,8 +54,9 @@ While developing a plugin it is recommended to use a temporary install. See [Ins
 # Implementing a Proxy Repository
 
 Each format has one more remote repositories that are used for fetching packages and metadata (e.g. Maven has [Maven Central](https://search.maven.org) , 
-npm has [npmjs.org](https://www.npmjs.com)). A Proxy repository allows you to create a cache of a remote repository. They increase the speed of your builds 
-and give you access to packages when the remote is unavailable.
+npm has [npmjs.org](https://www.npmjs.com)). A [Proxy Repository](https://help.sonatype.com/display/NXRM3/Repository+Management#RepositoryManagement-ProxyRepository) 
+allows you to create a cache of a remote repository. They increase the speed of your builds and give you access to packages 
+when the remote is unavailable.
 
 ## Proxy Recipe
 
@@ -155,7 +156,7 @@ Each of the "Facets" that get attached to the repository provide functionality.
 
 | Facet                 | Definition                                                   |
 |-----------------------|--------------------------------------------------------------|
-| SecurityFacet         | Adds authorization to the repository. (Defined by the format)|
+| SecurityFacet         | Adds authorization to the repository. (Defined per the format)|
 | ViewFacet             | Provides the http endpoint.                                  |
 | HttpClientFacet       | Allows the repository to make http requests.                 |
 | NegativeCacheFacet    | Caches 404 responses for performance.                        |
@@ -164,4 +165,254 @@ Each of the "Facets" that get attached to the repository provide functionality.
 | SearchFacet           | Adds search functionality.                                   |               
 | PurgeUnusedFacet      | Allows the repository to be used with the Purge unused task. |
 
-The security facet is defined per-format and these classes were created from the archetype.
+## Configuring the endpoints
+
+The ```configure()``` method in the code above builds a route and assigns it to the view facet. Multiple ```.route()``` 
+calls can be defined if your format has multiple endpoints. In this example we have defined a single endpoint which has a matcher
+that will match any path. It is defined by ```new TokenMatcher('/{name:.+}') ```. The use of ```TokenMatcher``` here 
+allows us to extract the value of the path and assign it to a variable called ```name``` which will be accessible to 
+any/all inbound requests.
+
+The endpoints you will need to define depend on the format that you trying to support. A way of determining those endpoints
+is to use a tool like Wireshark or Charles proxy to see what requests your format's client makes to its remote. It is those
+requests that you will likely need to add matchers for.
+
+For each route it then configures which handlers the request will pass through.
+
+## Request handlers
+
+Inbound requests will be first matched against each of the matchers associated with the ```ViewFacet```. If they match then the
+request will be passed through the route and therefore passed to each handler defined in the route.
+
+| Handler                   | Definition                                                                          |
+|---------------------------|-------------------------------------------------------------------------------------|
+| TimingHandler             | Records request metrics.                                                            |
+| SecurityHandler           | Uses the security facet to check the request for the correct authorization.         |
+| ExceptionHandler          | Converts exceptions into meaningful http codes.                                     |
+| HandlerContributor        | Allows support for user-configured handlers.                                        |
+| NegativeCacheHandler      | Uses the negative cached facet to cache 404 responses.                              |
+| ConditionalRequestHandler | Handles conditional requests (e.g. if-modified, etag).                              |
+| PartialFetchHandler       | Implements partial-fetch semantics (as per RFC 2616).                               |               
+| UnitOfWorkHandler         | Scopes a sequence of work containing transactional methods                          |
+| ProxyHandler              | Adds common proxy functionality and makes use of the ProxyFacet for caching assets. |
+
+## Proxy Facet
+The stock proxy handler relies on a format-specific Proxy Facet Implementation for fetching, manipulating and storing
+requested packages and metadata.
+
+Create a Proxy Facet implementation for the Foo format. Extending ProxyFacetSupport removes a lot of the http request
+boilerplate.
+
+```
+com.sonatype.repository.foo.internal.proxy.FooProxyFacet.java
+```
+
+```java
+package com.sonatype.repository.foo.internal.proxy;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Named;
+
+import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.common.collect.AttributesMap;
+import org.sonatype.nexus.common.hash.HashAlgorithm;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.cache.CacheInfo;
+import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.AssetBlob;
+import org.sonatype.nexus.repository.storage.Bucket;
+import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.storage.TempBlob;
+import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
+import org.sonatype.nexus.repository.transaction.TransactionalStoreMetadata;
+import org.sonatype.nexus.repository.transaction.TransactionalTouchBlob;
+import org.sonatype.nexus.repository.transaction.TransactionalTouchMetadata;
+import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.Context;
+import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.transaction.UnitOfWork;
+
+import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
+import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
+import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
+
+@Named
+public class FooProxyFacet
+    extends ProxyFacetSupport
+{
+  private static final List<HashAlgorithm> hashAlgorithms = Arrays.asList(MD5, SHA1);
+
+  @Override
+  protected Content getCachedContent(final Context context) throws IOException {
+    final String path = componentPath(context);
+    return get(path);
+  }
+
+  @Override
+  protected void indicateVerified(final Context context, final Content content, final CacheInfo cacheInfo)
+      throws IOException
+  {
+    setCacheInfo(componentPath(context), content, cacheInfo);
+  }
+
+  @Override
+  protected Content store(final Context context, final Content payload) throws IOException {
+    final String path = componentPath(context);
+    return put(path, payload);
+  }
+
+  @Override
+  protected String getUrl(@Nonnull final Context context) {
+    return componentPath(context);
+  }
+
+  public Content put(final String path, final Payload content) throws IOException {
+    StorageFacet storageFacet = facet(StorageFacet.class);
+    try (TempBlob tempBlob = storageFacet.createTempBlob(content, hashAlgorithms)) {
+      return doPutContent(path, tempBlob, content);
+    }
+  }
+
+  @TransactionalStoreBlob
+  protected Content doPutContent(final String path, final TempBlob tempBlob, final Payload payload)
+      throws IOException
+  {
+    StorageTx tx = UnitOfWork.currentTx();
+
+    Asset asset = getOrCreateAsset(getRepository(), path, getGroup(path), path);
+
+    AttributesMap contentAttributes = null;
+    if (payload instanceof Content) {
+      contentAttributes = ((Content) payload).getAttributes();
+    }
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
+    AssetBlob assetBlob = tx.setBlob(
+        asset,
+        path,
+        tempBlob,
+        null,
+        payload.getContentType(),
+        false
+    );
+
+    tx.saveAsset(asset);
+
+    return toContent(asset, assetBlob.getBlob());
+  }
+
+  @TransactionalStoreMetadata
+  public Asset getOrCreateAsset(final Repository repository, final String componentName, final String componentGroup,
+                                final String assetName)
+  {
+    final StorageTx tx = UnitOfWork.currentTx();
+
+    final Bucket bucket = tx.findBucket(getRepository());
+    Component component = tx.findComponentWithProperty(P_NAME, componentName, bucket);
+    Asset asset;
+    if (component == null) {
+      // CREATE
+      component = tx.createComponent(bucket, getRepository().getFormat())
+          .group(componentGroup)
+          .name(componentName);
+
+      tx.saveComponent(component);
+
+      asset = tx.createAsset(bucket, component);
+      asset.name(assetName);
+    }
+    else {
+      // UPDATE
+      asset = tx.firstAsset(component);
+    }
+
+    asset.markAsDownloaded();
+
+    return asset;
+  }
+
+  private String componentPath(final Context context) {
+    final TokenMatcher.State tokenMatcherState = context.getAttributes().require(TokenMatcher.State.class);
+    return tokenMatcherState.getTokens().get("name");
+  }
+
+  @Nullable
+  @TransactionalTouchBlob
+  protected Content get(final String path) {
+    StorageTx tx = UnitOfWork.currentTx();
+
+    final Asset asset = findAsset(tx, path);
+    if (asset == null) {
+      return null;
+    }
+    if (asset.markAsDownloaded()) {
+      tx.saveAsset(asset);
+    }
+
+    final Blob blob = tx.requireBlob(asset.requireBlobRef());
+    return toContent(asset, blob);
+  }
+
+  @TransactionalTouchMetadata
+  protected void setCacheInfo(final String path, final Content content, final CacheInfo cacheInfo) throws IOException {
+    StorageTx tx = UnitOfWork.currentTx();
+    Bucket bucket = tx.findBucket(getRepository());
+
+    Asset asset = Content.findAsset(tx, bucket, content);
+    if (asset == null) {
+      Component component = tx.findComponentWithProperty(P_NAME, path, bucket);
+      if (component != null) {
+        asset = tx.firstAsset(component);
+      }
+    }
+    if (asset == null) {
+      log.debug("Attempting to set cache info for non-existent foo component {}", path);
+      return;
+    }
+
+    log.debug("Updating cacheInfo of {} to {}", path, cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
+    tx.saveAsset(asset);
+  }
+
+  private Asset findAsset(StorageTx tx, String path) {
+    return tx.findAssetWithProperty(P_NAME, path, tx.findBucket(getRepository()));
+  }
+
+  private Content toContent(final Asset asset, final Blob blob) {
+    final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
+    Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
+    return content;
+  }
+
+  private static String getGroup(String path) {
+    StringBuilder group = new StringBuilder();
+    if (!path.startsWith("/")) {
+      group.append("/");
+    }
+    int i = path.lastIndexOf("/");
+    if (i != -1) {
+      group.append(path.substring(0, i));
+    }
+    return group.toString();
+  }
+}
+```
+
+I don't intend to go through every line of code in this example but here are some things to note:
+
+- Transactional methods are annotated with @Transactional* annotations.
+- Transactional methods must be overridable (i.e. either public or protected) so that the transactional behaviour can be 
+added. This is an example of Aspect Oriented Programming (AOP).
+- Two things get saved to the database for each fetch, an [Asset and a Component](https://help.sonatype.com/display/NXRM3/Components%2C+Repositories%2C+and+Repository+Formats). In our Foo format example there is a 1-1 relationship between the assets and components.
+- If redeploy is enabled on a repository then assets can be updated.
+- The contents of the fetched package (its bytes) are written to the [Blob Store](https://help.sonatype.com/display/NXRM3/Repository+Management#RepositoryManagement-BlobStores).
