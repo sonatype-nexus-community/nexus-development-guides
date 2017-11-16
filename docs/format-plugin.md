@@ -63,7 +63,7 @@ when the remote is unavailable.
 Each repository type for each format has its own "Recipe". A Recipe class defines the endpoints that are available for the format, the routes each 
 endpoint can take and what functionality is available to the repository. 
 
-The archetype you used to initialise your new plugin has a RecipeSupport class that comes with some pre-configured functionality.
+The archetype you used to initialise your new plugin has a RecipeSupport class that comes with pre-configured functionality.
 
 Create a recipe for a Proxy repository for the Foo format.
 
@@ -156,9 +156,9 @@ Each of the "Facets" that get attached to the repository provide functionality.
 
 | Facet                 | Definition                                                   |
 |-----------------------|--------------------------------------------------------------|
-| SecurityFacet         | Adds authorization to the repository. (Defined per the format)|
+| SecurityFacet         | Adds authorization to the repository (Defined per format).   |
 | ViewFacet             | Provides the http endpoint.                                  |
-| HttpClientFacet       | Allows the repository to make http requests.                 |
+| HttpClientFacet       | Allows the repository to make http requests to a remote.     |
 | NegativeCacheFacet    | Caches 404 responses for performance.                        |
 | StorageFacet          | Gives access to the blob store and databases.                |
 | AttributesFacet       | Handles attributes of the repository itself.                 |
@@ -169,19 +169,21 @@ Each of the "Facets" that get attached to the repository provide functionality.
 
 The ```configure()``` method in the code above builds a route and assigns it to the view facet. Multiple ```.route()``` 
 calls can be defined if your format has multiple endpoints. In this example we have defined a single endpoint which has a matcher
-that will match any path. It is defined by ```new TokenMatcher('/{name:.+}') ```. The use of ```TokenMatcher``` here 
-allows us to extract the value of the path and assign it to a variable called ```name``` which will be accessible to 
-any/all inbound requests.
+that will match any path. It is defined by ```new TokenMatcher('/{name:.+}') ```. 
+
+The use of ```TokenMatcher``` here allows us to extract the value of the path and assign it to a variable called ```name``` which will 
+be accessible to all inbound requests. [Other matcher types are available in the package 
+```org.sonatype.nexus.repository.view.matchers```](https://github.com/sonatype/nexus-public/tree/master/components/nexus-repository/src/main/java/org/sonatype/nexus/repository/view/matchers)
 
 The endpoints you will need to define depend on the format that you trying to support. A way of determining those endpoints
-is to use a tool like Wireshark or Charles proxy to see what requests your format's client makes to its remote. It is those
-requests that you will likely need to add matchers for.
+is to use tools like Wireshark or Charles proxy to see what requests your format's client makes to its remote. It is those
+requests that you will need to add matchers and routes for.
 
-For each route it then configures which handlers the request will pass through.
+For each route in the ```configure()``` method we then define which handlers the request will pass through.
 
 ## Request handlers
 
-Inbound requests will be first matched against each of the matchers associated with the ```ViewFacet```. If they match then the
+Inbound requests will be matched against each of the matchers associated with the ```ViewFacet```. If they match then the
 request will be passed through the route and therefore passed to each handler defined in the route.
 
 | Handler                   | Definition                                                                          |
