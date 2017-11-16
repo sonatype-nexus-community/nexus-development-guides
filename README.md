@@ -1,2 +1,2 @@
 # Nexus Development Guides
-TBD
+Documentation: https://sonatype-nexus-community.github.io/nexus-development-guides/
