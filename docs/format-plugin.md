@@ -3,6 +3,10 @@
 This guide provides an introduction on developing a plugin to add support for a new format to Nexus Repository Manager 3. 
 It will give you a quick introduction into coding a format. It won't cover the nitty gritty of how to reverse engineer a format.
 
+:toc: macro
+:toc-title:
+:toclevels: 99
+
 # What you'll build
 
 You'll build a simple plugin with support for Proxy, Hosted and Group repositories. More information about the different repository types is 
