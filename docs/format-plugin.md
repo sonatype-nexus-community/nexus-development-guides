@@ -173,7 +173,7 @@ that will match any path. It is defined by ```new TokenMatcher('/{name:.+}') ```
 
 The use of ```TokenMatcher``` here allows us to extract the value of the path and assign it to a variable called ```name``` which will 
 be accessible to all inbound requests. [Other matcher types are available in the package 
-```org.sonatype.nexus.repository.view.matchers```](https://github.com/sonatype/nexus-public/tree/master/components/nexus-repository/src/main/java/org/sonatype/nexus/repository/view/matchers)
+org.sonatype.nexus.repository.view.matchers](https://github.com/sonatype/nexus-public/tree/master/components/nexus-repository/src/main/java/org/sonatype/nexus/repository/view/matchers)
 
 The endpoints you will need to define depend on the format that you trying to support. A way of determining those endpoints
 is to use tools like Wireshark or Charles proxy to see what requests your format's client makes to its remote. It is those
