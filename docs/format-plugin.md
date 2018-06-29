@@ -41,14 +41,14 @@ First create a new plugin project. The simplest way is to use the format-plugin 
 (See [Archetype GitHub Repository](https://github.com/sonatype-nexus-community/nexus-format-archetype) for more information).
 
   ``` 
-    mvn archetype:generate                              
-    -DarchetypeArtifactId=format-plugin               
-    -DarchetypeGroupId=org.sonatype.nexus.archetype   
-    -DarchetypeVersion=1.0-SNAPSHOT                   
-    -DgroupId=com.sonatype.repository                 
-    -DartifactId=nexus-repository-foo                 
-    -DpluginFormat=foo                                
-    -DpluginClass=Foo                                 
+    mvn archetype:generate \
+    -DarchetypeArtifactId=nexus-format-archetype \
+    -DarchetypeGroupId=org.sonatype.nexus.archetype \
+    -DarchetypeVersion=1.0-SNAPSHOT \
+    -DgroupId=com.sonatype.repository \
+    -DartifactId=nexus-repository-foo \
+    -DpluginFormat=foo \
+    -DpluginClass=Foo \
     -Dversion=1.0-SNAPSHOT 
   ```   
   
