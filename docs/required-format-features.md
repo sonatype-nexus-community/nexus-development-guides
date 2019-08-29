@@ -19,7 +19,8 @@ formats will fit nicely in to these boxes but we still try our best.
  - If your implementation does not support all client versions, make it clear which ones work
 
 ### Features
-These are the minimum set of features we must support for a new format.
+These are the minimum set of features we implement for a new format. It may not be possible to implement all of these 
+features for some formats, those cases should be documented explicitly.
 
  - Search
  - Cleanup policies
