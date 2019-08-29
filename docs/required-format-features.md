@@ -16,7 +16,7 @@ formats will fit nicely in to these boxes but we still try our best.
  - Cached packages should always be available to clients, even when removed from the remote
  - Builds that work online should be reproducible when the remote is offline
  - NXRM should only download from endpoints that are explicitly trusted by the end user
- - We may not support all client versions but make it clear which ones we do support
+ - If your implementation does not support all client versions, make it clear which ones work
 
 ### Features
 These are the minimum set of features we must support for a new format.
