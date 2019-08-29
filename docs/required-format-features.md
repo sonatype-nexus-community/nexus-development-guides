@@ -32,7 +32,7 @@ features for some formats, those cases should be documented explicitly.
  - Database restore from blobs (Task: 'Repair - Reconcile component database from blob store')
  - Components exist for artifacts
  
-### Artifacts
+### Deliverables
  - Help documentation
  - Manual test documentation
  - A KAR build published to Maven Central
