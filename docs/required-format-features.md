@@ -8,7 +8,7 @@ can become a core part of Nexus Repository Manager 3.
 
 ### Principles
 The following are a set of principles to keep in mind when developing a format. They are aspirational and not all
-formats will fit nicely in to these boxes but we still try our best.
+formats will fit nicely in to these boxes, try your best!
 
  - Usage should be transparent to developers
  - Require the minimum amount of developer setup
