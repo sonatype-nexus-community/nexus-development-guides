@@ -1,4 +1,4 @@
-# NXRM Required format features
+# NXRM required format features
 
 Before Sonatype can officially support a contributed format there are a set of features and tasks that must be completed. 
 The intent of this guide is to document those features and make it clear what you need to do so that your contributions 
