@@ -23,13 +23,13 @@ These are the minimum set of features we implement for a new format. It may not 
 features for some formats, those cases should be documented explicitly.
 
  - Search
+ - Tree browse
  - Cleanup policies
  - The format should be disabled in HA-C mode
  - Routing rule support
  - API for provisioning repositories via Scripts
  - UI Upload (Hosted repositories only)
  - Database restore from blobs (Task: 'Repair - Reconcile component database from blob store')
- - Tree browse
  - Components exist for artifacts
  
 ### Artifacts
