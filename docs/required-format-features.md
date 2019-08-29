@@ -28,7 +28,7 @@ features for some formats, those cases should be documented explicitly.
  - Routing rule support
  - API for provisioning repositories via Scripts
  - UI Upload (Hosted repositories only)
- - Database restore from blobs
+ - Database restore from blobs (Task: 'Repair - Reconcile component database from blob store')
  - Tree browse
  - Components exist for artifacts
  
